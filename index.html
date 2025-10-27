@@ -3,656 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Operación Amor ❤️</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Menú Principal</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
+
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      padding: 20px;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      font-family: 'Poppins', sans-serif;
       text-align: center;
-      cursor: pointer; /* Indica que la página es interactiva */
+      overflow: hidden;
     }
-    
-    .container {
-      max-width: 800px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 30px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
-      margin: 20px 0;
-      position: relative;
-      z-index: 10;
-    }
-    
+
     h1 {
-      font-size: 2.2rem;
-      color: #fff;
+      color: white;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-      margin-bottom: 30px;
-      line-height: 1.4;
+      margin-bottom: 40px;
+      font-size: 2rem;
     }
-    
-    .buttons-container {
+
+    .menu {
       display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin: 30px 0;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 25px;
     }
-    
-    .single-button-container {
-      display: flex;
-      justify-content: center;
-      margin: 30px 0;
-    }
-    
+
     button {
-      padding: 15px 30px;
-      font-size: 1.2rem;
+      padding: 15px 45px;
+      font-size: 1.3rem;
       border: none;
       border-radius: 30px;
       cursor: pointer;
       transition: all 0.3s ease;
-      min-width: 150px;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
-    
-    .yes {
+
+    .propuesta {
       background-color: #ff4d6d;
-      color: white;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    
-    .yes:hover {
-      transform: scale(1.05);
+
+    .propuesta:hover {
       background-color: #fe3460;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-    }
-    
-    .no {
-      background-color: #6c757d;
-      color: white;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      position: relative;
-    }
-    
-    .no:hover {
       transform: scale(1.05);
-      background-color: #5a6268;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
-    
-    .message {
-      display: none;
-      font-size: 1.8rem;
-      color: #fff;
-      margin: 30px 0;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-      line-height: 1.6;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 15px;
+
+    .cumple {
+      background-color: #ffb300;
     }
-    
-    .second-question {
-      display: none;
-      animation: fadeIn 1s;
+
+    .cumple:hover {
+      background-color: #e6a000;
+      transform: scale(1.05);
     }
-    
-    .special-message {
-      display: none;
-      animation: fadeIn 1s;
-    }
-    
-    .special-message h2 {
-      font-size: 2.2rem;
-      color: #fff;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-      margin-bottom: 30px;
-      line-height: 1.6;
-    }
-    
-    .second-question h2 {
-      font-size: 2.2rem;
-      color: #fff;
-      text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-      margin-bottom: 30px;
-    }
-    
-    .gallery-container {
-      display: none;
-      width: 100%;
-      margin: 20px 0;
-      animation: fadeIn 1.5s;
-    }
-    
-    .gallery-title {
-      text-align: center;
-      color: #fff;
-      font-size: 1.8rem;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    .photo-gallery {
-      display: flex;
-      overflow-x: auto;
-      gap: 20px;
-      padding: 15px;
-      scrollbar-width: thin;
-      scrollbar-color: #ff4d6d #fad0c4;
-    }
-    
-    .photo-gallery::-webkit-scrollbar {
-      height: 8px;
-    }
-    
-    .photo-gallery::-webkit-scrollbar-track {
-      background: #fad0c4;
-      border-radius: 10px;
-    }
-    
-    .photo-gallery::-webkit-scrollbar-thumb {
-      background: #ff4d6d;
-      border-radius: 10px;
-    }
-    
-    .photo-item {
-      min-width: 250px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 15px;
-      padding: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    
-    .photo-image {
-      width: 100%;
-      height: 200px;
-      border-radius: 10px;
-      object-fit: cover;
-      margin-bottom: 10px;
-      border: 3px solid white;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    
-    .photo-text {
-      color: #5a3d5c;
-      font-weight: 500;
-      font-size: 1rem;
-    }
-    
-    .music-control {
+
+    .heart {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(255, 77, 109, 0.7);
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      z-index: 100;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-    }
-    
-    .music-control:hover {
-      transform: scale(1.1);
-      background: rgba(255, 77, 109, 0.9);
-    }
-    
-    .music-control i {
-      font-size: 1.5rem;
-      color: white;
-    }
-    
-    .audio-message {
-      margin-top: 15px;
-      font-size: 1rem;
-      color: #5a3d5c;
-      font-style: italic;
-    }
-    
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
+      top: -10px;
+      font-size: 20px;
+      animation: fall linear forwards;
+      opacity: 0.8;
+      user-select: none;
       z-index: -1;
     }
-    
-    /* Estilos para los corazones */
-    .heart {
-      position: absolute;
-      pointer-events: none;
-      z-index: 5;
-      font-size: 20px;
-      text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-      opacity: 0.8;
-      animation: falling-heart 10s linear infinite;
-    }
-    
-    @keyframes falling-heart {
-      0% {
-        transform: translateY(-10%) rotate(0deg);
-        opacity: 0.8;
-      }
-      100% {
-        transform: translateY(110vh) rotate(360deg);
-        opacity: 0;
-      }
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes heartBeat {
-      0% { transform: scale(1); }
-      25% { transform: scale(1.1); }
-      50% { transform: scale(1); }
-      75% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    
-    .heart-beat {
-      animation: heartBeat 1.5s infinite;
-    }
-    
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      .second-question h2, .special-message h2 {
-        font-size: 1.8rem;
-      }
-      
-      .buttons-container {
-        flex-direction: column;
-        align-items: center;
-      }
-      
-      button {
-        width: 100%;
-        max-width: 250px;
-      }
-      
-      .message {
-        font-size: 1.5rem;
-      }
-      
-      .heart {
-        font-size: 16px;
-      }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>⚠️ ¡Atención Sofía! ⚠️ <br><br>
-    Has desbloqueado una misión secreta…
-    y es exclusiva solo para ti 💌</h1>
-    
-    <div class="single-button-container">
-      <button class="yes">Ver misión 🔓</button>
-    </div>
-    
-    <p class="audio-message">La música comenzará automáticamente cuando interactúes con la página</p>
-  </div>
-  
-  <div class="container second-question">
-    <h2>✨ Bienvenida Sofía… ✨
+  <h1>💌 Bienvenida Sofía 💌</h1>
 
-    Hoy quiero confiarte algo muy especial. 💌<br><br>
-    Desde que llegaste, mi mundo cambió y descubrí lo bonito que es compartir los días contigo.
+  <div class="menu">
+    <!-- Botón que abre la carpeta PROPUESTA -->
+    <button class="propuesta" onclick="window.location.href='./PROPUESTA/index.html'">
+    Mi propuesta 💖
+    </button>
 
-    Tu primera misión será sencilla, pero al mismo tiempo la más importante de todas:
-    🌹 <br><br>¿Te gustaría formar parte de mi vida?<br><br></h2>
-    
-    <div class="buttons-container">
-      <button class="yes second-yes">¡Sí! 💖</button>
-      <button class="no second-no" id="secondRejectBtn">No 💔</button>
-    </div>
-  </div>
-  
-  <!-- Nueva sección añadida -->
-  <div class="container special-message">
-    <h2>Pero no como cualquiera… tú serás única, especial y la razón de mis sonrisas.<br><br>
-    💖 Sofía Gallardo, ¿te gustaría ser mi novia? 💖</h2>
-    
-    <div class="buttons-container">
-      <button class="yes final-yes">¡SÍ, ACEPTO! </button>
-      <button class="no final-no" id="finalRejectBtn">No puedo 💔</button>
-    </div>
-  </div>
-  
-  <div class="container">
-    <div class="message">Nuestro futuro comienza aquí… contigo todo tiene sentido y cada latido nos acerca más a lo imposible 💖✨</div>
-    
-    <div class="gallery-container">
-      <h2 class="gallery-title">Este futuro no lo imagino con nadie más que contigo 💌</h2>
-      <div class="photo-gallery">
-        <div class="photo-item">
-          <img src="IMG/010d4ae7-5364-42ad-a9ad-517d24f393bf.JPG" class="photo-image" alt="Amaneceres juntos">
-          <p class="photo-text">Mil aventuras nos esperan, y quiero que sean a tu lado </p>
-        </div>
-        <div class="photo-item">
-          <img src="IMG/39a2d940-5fa1-4fe7-8861-70b3e7be72fb.JPG" class="photo-image" alt="Cenas románticas">
-          <p class="photo-text">Cuando estoy contigo, cada segundo se vuelve inolvidable </p>
-        </div>
-        <div class="photo-item">
-          <img src="IMG/9bebfa47-4db0-4ea5-8985-53354e8520eb 2.JPG" class="photo-image" alt="Aventuras por vivir">
-          <p class="photo-text">Cada instante contigo es un recuerdo que dura para siempre.</p>
-        </div>
-        <div class="photo-item">
-          <img src="IMG/ca2af218-400b-481d-b896-8950bd06a968.JPG" class="photo-image" alt="Noches de película">
-          <p class="photo-text">Momentos que hacen que el tiempo se detenga</p>
-        </div>
-        <div class="photo-item">
-          <img src="IMG/IMG_2019.jpg" class="photo-image" alt="Celebraciones">
-          <p class="photo-text">Que mis sueños se crucen con los tuyos</p>
-        </div>
-        <div class="photo-item">
-          <img src="IMG/DC8D1418-C453-4914-BBC9-6E70FFADB336.jpeg" class="photo-image" alt="Celebraciones">
-          <p class="photo-text">No necesito planes perfectos, solo que estés tú.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="music-control" id="musicControl">
-    <i class="fas fa-pause"></i>
-  </div>
-
-  <!-- Solo una canción que se reproduce en bucle -->
-  <audio id="bgMusic" loop preload="auto">
-    <source src="Kurt - La Mujer Perfecta (Lyric Video).mp3" type="audio/mpeg">
-    Tu navegador no soporta el elemento de audio.
-  </audio>
-
-  <canvas id="confetti"></canvas>
+    <button class="cumple" onclick="window.location.href='./FELIZ CUMPLEÑOS/index.html'">
+    Feliz cumpleaños 🎂
+    </button>
 
   <script>
-    // Elementos DOM
-    const secondNoBtn = document.getElementById('secondRejectBtn');
-    const finalNoBtn = document.getElementById('finalRejectBtn');
-    const yesBtn = document.querySelector('.yes');
-    const secondYesBtn = document.querySelector('.second-yes');
-    const finalYesBtn = document.querySelector('.final-yes');
-    const secondQuestion = document.querySelector('.second-question');
-    const specialMessage = document.querySelector('.special-message');
-    const message = document.querySelector('.message');
-    const galleryContainer = document.querySelector('.gallery-container');
-    const musicControl = document.getElementById('musicControl');
-    const bgMusic = document.getElementById('bgMusic');
-    
-    // Variables de estado
-    let musicPlaying = false;
-    let rejectMoveEnabled = true;
-    let audioStarted = false;
-
-    // Función para iniciar la música
-    function startMusic() {
-      if (audioStarted) return;
-      
-      bgMusic.volume = 0.7;
-      bgMusic.play().then(() => {
-        console.log("Música reproducida con éxito");
-        musicPlaying = true;
-        audioStarted = true;
-        musicControl.style.display = 'flex';
-        musicControl.innerHTML = '<i class="fas fa-pause"></i>';
-        
-        // Ocultar el mensaje de audio después de iniciar
-        const audioMessage = document.querySelector('.audio-message');
-        if (audioMessage) {
-          audioMessage.style.display = 'none';
-        }
-      }).catch(e => {
-        console.error("Error al reproducir música:", e);
-        // Si falla la reproducción automática, mostramos el control para que el usuario active la música
-        musicControl.style.display = 'flex';
-        musicControl.innerHTML = '<i class="fas fa-play"></i>';
-        musicPlaying = false;
-      });
-    }
-
-    // Intentar iniciar música cuando la página cargue (puede fallar por políticas de autoplay)
-    window.addEventListener('load', function() {
-      // Pequeño retraso para mejorar las posibilidades de autoplay
-      setTimeout(startMusic, 300);
-    });
-
-    // Iniciar música con cualquier interacción del usuario
-    document.body.addEventListener('click', function() {
-      if (!audioStarted) {
-        startMusic();
-      }
-    });
-
-    // También iniciar música con eventos táctiles para dispositivos móviles
-    document.body.addEventListener('touchstart', function() {
-      if (!audioStarted) {
-        startMusic();
-      }
-    });
-
-    // Función para crear corazones que caen (verdes, azules y amarillos)
-    function createHearts() {
-      const heartEmojis = ['💚', '💙', '💛']; // Solo los corazones solicitados
-      const heartColors = ['#00cc66', '#3399ff', '#ffcc00']; // Verde, azul, amarillo
-      const numberOfHearts = 30;
-      
-      for (let i = 0; i < numberOfHearts; i++) {
-        setTimeout(() => {
-          const heart = document.createElement('div');
-          heart.className = 'heart';
-          
-          // Seleccionar un corazón aleatorio de los tres
-          const heartIndex = Math.floor(Math.random() * heartEmojis.length);
-          heart.innerHTML = heartEmojis[heartIndex];
-          heart.style.color = heartColors[heartIndex];
-          
-          heart.style.left = Math.random() * 100 + 'vw';
-          heart.style.animationDuration = (Math.random() * 10 + 5) + 's';
-          heart.style.fontSize = (Math.random() * 15 + 15) + 'px';
-          heart.style.opacity = Math.random() * 0.5 + 0.3;
-          
-          document.body.appendChild(heart);
-          
-          // Eliminar el corazón después de que termine la animación
-          setTimeout(() => {
-            heart.remove();
-          }, 15000);
-        }, i * 300);
-      }
-    }
-    
-    // Función para crear corazones especiales (más grandes)
-    function createSpecialHeart() {
-      const heartEmojis = ['💚', '💙', '💛'];
-      const heartColors = ['#00cc66', '#3399ff', '#ffcc00'];
-      
+    // Efecto de corazones cayendo
+    function crearCorazones() {
+      const corazones = ['💖', '💘', '💕', '❤️', '💗'];
       const heart = document.createElement('div');
       heart.className = 'heart';
-      
-      // Seleccionar un corazón aleatorio de los tres
-      const heartIndex = Math.floor(Math.random() * heartEmojis.length);
-      heart.innerHTML = heartEmojis[heartIndex];
-      heart.style.color = heartColors[heartIndex];
-      
+      heart.textContent = corazones[Math.floor(Math.random() * corazones.length)];
       heart.style.left = Math.random() * 100 + 'vw';
-      heart.style.animationDuration = (Math.random() * 5 + 3) + 's';
-      heart.style.fontSize = (Math.random() * 25 + 25) + 'px';
-      heart.style.opacity = Math.random() * 0.5 + 0.5;
-      heart.style.zIndex = '8';
-      
+      heart.style.animationDuration = (4 + Math.random() * 4) + 's';
+      heart.style.fontSize = (15 + Math.random() * 15) + 'px';
       document.body.appendChild(heart);
-      
-      // Eliminar el corazón después de que termine la animación
-      setTimeout(() => {
-        heart.remove();
-      }, 10000);
+      setTimeout(() => heart.remove(), 8000);
     }
-    
-    // Crear corazones iniciales y repetir cada 15 segundos
-    createHearts();
-    setInterval(createHearts, 15000);
-
-    // Función para mover botón de rechazo
-    function moveButton(button) {
-      if (!rejectMoveEnabled) return;
-      
-      const x = Math.random() * (window.innerWidth - button.offsetWidth - 40);
-      const y = Math.random() * (window.innerHeight - button.offsetHeight - 40);
-      
-      button.style.position = 'fixed';
-      button.style.left = `${x}px`;
-      button.style.top = `${y}px`;
-    }
-
-    // Event listeners para botones de rechazo
-    secondNoBtn.addEventListener('mouseover', () => moveButton(secondNoBtn));
-    finalNoBtn.addEventListener('mouseover', () => moveButton(finalNoBtn));
-    
-    secondNoBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      moveButton(secondNoBtn);
-    });
-    
-    finalNoBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      moveButton(finalNoBtn);
-    });
-
-    // Botón de aceptar primera pregunta
-    yesBtn.addEventListener('click', () => {
-      document.querySelector('.container:first-child').style.display = 'none';
-      secondQuestion.style.display = 'block';
-      setTimeout(() => {
-        secondQuestion.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    });
-
-    // Botón de aceptar segunda pregunta
-    secondYesBtn.addEventListener('click', () => {
-      secondQuestion.style.display = 'none';
-      specialMessage.style.display = 'block';
-      setTimeout(() => {
-        specialMessage.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    });
-
-    // Botón de aceptar pregunta final
-    finalYesBtn.addEventListener('click', () => {
-      specialMessage.style.display = 'none';
-      message.style.display = 'block';
-      galleryContainer.style.display = 'block';
-      rejectMoveEnabled = false;
-      launchConfetti();
-      
-      // Crear más corazones al aceptar
-      for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-          createSpecialHeart();
-        }, i * 100);
-      }
-      
-      setTimeout(() => {
-        galleryContainer.scrollIntoView({ behavior: 'smooth' });
-      }, 1000);
-    });
-
-    // Control de música
-    musicControl.addEventListener('click', () => {
-      if (musicPlaying) {
-        // Pausar la música
-        bgMusic.pause();
-        musicControl.innerHTML = '<i class="fas fa-play"></i>';
-      } else {
-        // Reanudar la música
-        bgMusic.play().catch(e => {
-          console.error("Error al reanudar música:", e);
-        });
-        musicControl.innerHTML = '<i class="fas fa-pause"></i>';
-      }
-      musicPlaying = !musicPlaying;
-    });
-
-    // Sistema de confeti
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const confettis = [];
-    
-    function Confetti() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height - canvas.height;
-      this.size = Math.random() * 8 + 2;
-      this.speed = Math.random() * 3 + 2;
-      // Colores que coinciden con los corazones (verde, azul, amarillo)
-      const colors = ['#00cc66', '#3399ff', '#ffcc00'];
-      this.color = colors[Math.floor(Math.random() * colors.length)];
-    }
-    
-    Confetti.prototype.update = function() {
-      this.y += this.speed;
-      if (this.y > canvas.height) {
-        this.y = -10;
-        this.x = Math.random() * canvas.width;
-      }
-    };
-    
-    Confetti.prototype.draw = function() {
-      ctx.fillStyle = this.color;
-      ctx.fillRect(this.x, this.y, this.size, this.size);
-    };
-
-    function launchConfetti() {
-      for (let i = 0; i < 150; i++) {
-        confettis.push(new Confetti());
-      }
-      animate();
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confettis.forEach((c) => {
-        c.update();
-        c.draw();
-      });
-      requestAnimationFrame(animate);
-    }
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
+    setInterval(crearCorazones, 300);
   </script>
 </body>
 </html>

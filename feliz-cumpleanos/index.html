@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinLove — Tu mejor inversión</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    /* ===== Scroll Reveal & Glassmorphism ===== */
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(14px) saturate(130%);
+    }
+    body.light .glass {
+      background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.35));
+      border: 1px solid rgba(0,0,0,.06);
+      backdrop-filter: blur(10px) saturate(110%);
+    }
+
+    /* ===== Fancy Charts ===== */
+    .area {
+      width:100%; height:220px; position:relative; border-radius:12px;
+      background: linear-gradient(180deg, rgba(90,169,230,.10), rgba(90,169,230,0) 60%);
+      border:1px solid rgba(255,255,255,.06); overflow:hidden;
+    }
+    body.light .area { border:1px solid rgba(0,0,0,.1); }
+    .area svg { width:100%; height:100% }
+
+    .rings {
+      display:flex; gap:18px; align-items:center; flex-wrap:wrap;
+    }
+    .ring {
+      --size:120px;
+      width:var(--size); height:var(--size); border-radius:50%;
+      background:
+        radial-gradient(closest-side, var(--panel) 70%, transparent 71% 99%, var(--panel) 0),
+        conic-gradient(var(--c) var(--p), rgba(255,255,255,.08) 0);
+      position:relative;
+      box-shadow: inset 0 0 24px rgba(0,0,0,.45);
+    }
+    .ring::after{
+      content: attr(data-label);
+      position:absolute; inset:0; display:grid; place-items:center;
+      font-weight:700; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.4);
+    }
+    body.light .ring::after{ color:#222; text-shadow:none }
+
+    /* ===== Tooltip for KPI double click ===== */
+    .kpi-tooltip {
+      position:absolute; right:12px; top:12px; padding:8px 10px; border-radius:10px;
+      background: rgba(216,27,96,.15); color:#ffd7e6; font-weight:600; font-size:.85rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,.25); opacity:0; transform: translateY(-6px);
+      transition: .25s;
+      pointer-events:none;
+    }
+    .card.show-tip .kpi-tooltip { opacity:1; transform: translateY(0); }
+    body.light .kpi-tooltip { background: rgba(216,27,96,.12); color:#9c2f68 }
+
+    /* ===== Heart Rain ===== */
+    .heart-drop {
+      position: fixed; top:-20px; font-size:20px; will-change: transform, opacity;
+      animation: drop 3.2s linear forwards;
+      filter: drop-shadow(0 4px 8px rgba(216,27,96,.35));
+    }
+    @keyframes drop {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); opacity:1; }
+      90% { opacity:1; }
+      100% { transform: translateY(110vh) translateX(var(--dx)) rotate(20deg); opacity:0; }
+    }
+
+    /* ===== Fullscreen Mode overlay ===== */
+    #presentOverlay {
+      position: fixed; inset:0; background: radial-gradient(1200px 600px at 70% -10%, rgba(216,27,96,.25), transparent 60%), rgba(10,15,25,.85);
+      display:none; z-index: 2000; color:#fff; padding:40px;
+    }
+    #presentOverlay.active { display:block; }
+    #presentOverlay .stage {
+      max-width:1100px; margin:0 auto; display:grid; gap:18px;
+    }
+    #presentOverlay .stage .panel { background:transparent; border-color:rgba(255,255,255,.18) }
+    #presentOverlay .close {
+      position:absolute; right:20px; top:20px; background:rgba(255,255,255,.15); border:none; color:#fff; padding:8px 12px; border-radius:10px; cursor:pointer;
+    }
+
+    /* Presentation slide animations */
+    #presentOverlay .slide {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    #presentOverlay .slide.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== LoveCoin Canvas Card ===== */
+    #coinCard {
+      display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    }
+    #coinCanvas { width:260px; height:260px; background:transparent; border-radius:16px; border:1px dashed rgba(255,255,255,.18); }
+    body.light #coinCanvas { border-color: rgba(0,0,0,.15); }
+    :root{
+      --bg:#0c1117;
+      --panel:#101723;
+      --panel-2:#0f1620;
+      --card:#151e2d;
+      --text:#e6e8ec;
+      --muted:#9aa4b2;
+      --accent:#d81b60;   /* rosa amor */
+      --accent-2:#ffb300; /* dorado */
+      --ok:#3ddc97;
+      --warn:#ffd166;
+      --bad:#ef476f;
+      --grid-gap:18px;
+      --radius:14px;
+      --shadow:0 8px 28px rgba(0,0,0,.35);
+    }
+    body.light {
+      --bg:#f9f9f9;
+      --panel:#ffffff;
+      --panel-2:#f0f0f0;
+      --card:#ffffff;
+      --text:#222222;
+      --muted:#666666;
+      --accent:#d81b60;
+      --accent-2:#ffb300;
+      --ok:#3ddc97;
+      --warn:#ffd166;
+      --bad:#ef476f;
+      --shadow:0 8px 28px rgba(0,0,0,.1);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(216,27,96,.1), transparent 60%),
+        radial-gradient(1000px 500px at -10% 20%, rgba(255,179,0,.08), transparent 60%),
+        linear-gradient(180deg, #f9f9f9, #eaeaea 40%, #f1f1f1 100%);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(216,27,96,.20), transparent 60%),
+        radial-gradient(1000px 500px at -10% 20%, rgba(255,179,0,.18), transparent 60%),
+        linear-gradient(180deg, #0b0f16, #0e1420 40%, #0a0f19 100%);
+      overflow-x:hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Layout */
+    .layout{
+      display:grid;
+      grid-template-columns: 260px 1fr;
+      min-height:100vh;
+    }
+
+    aside{
+      background:linear-gradient(180deg, #0d1522, #0b1220);
+      border-right:1px solid rgba(255,255,255,.06);
+      padding:26px 18px;
+      position:sticky;
+      top:0; height:100vh;
+    }
+    body.light aside {
+      background: linear-gradient(180deg, #f0f0f0, #eaeaea);
+      border-right:1px solid rgba(0,0,0,.08);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; margin-bottom:26px;
+    }
+    .brand-logo{
+      width:42px; height:42px; border-radius:12px;
+      background: conic-gradient(from 220deg, var(--accent), var(--accent-2), var(--accent));
+      box-shadow:0 6px 18px rgba(216,27,96,.4), inset 0 0 22px rgba(255,255,255,.15);
+      cursor:pointer;
+    }
+    body.light .brand-logo {
+      box-shadow: 0 6px 18px rgba(216,27,96,.3), inset 0 0 22px rgba(0,0,0,.1);
+    }
+    .brand h1{font-size:1.1rem; margin:0; letter-spacing:.4px; user-select:none}
+
+    .nav{
+      display:flex; flex-direction:column; gap:8px;
+      margin-top:8px;
+    }
+    .nav a{
+      text-decoration:none; color:var(--text);
+      padding:12px 12px; border-radius:10px; display:flex; align-items:center; gap:10px;
+      background:transparent; transition:.25s;
+    }
+    .nav a:hover{ background:rgba(255,255,255,.06) }
+    body.light .nav a:hover{ background:rgba(0,0,0,.06) }
+    .nav a.active{ background:linear-gradient(90deg, rgba(216,27,96,.22), rgba(255,179,0,.16)); }
+
+    header.topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 22px; position:sticky; top:0; z-index:10;
+      background:rgba(13,18,30,.72); backdrop-filter:saturate(140%) blur(16px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    body.light header.topbar {
+      background:rgba(240,240,240,0.85);
+      border-bottom:1px solid rgba(0,0,0,.1);
+      color: var(--text);
+    }
+    .top-title{font-weight:700; letter-spacing:.3px; user-select:none}
+    .top-actions{
+      display:flex; align-items:center;
+    }
+    .kpis{
+      display:grid; gap:var(--grid-gap);
+      grid-template-columns: repeat(4, minmax(180px,1fr));
+      margin:22px 22px 0;
+    }
+    .card{
+      background:linear-gradient(180deg, #141c2f, #11192a);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      position:relative;
+    }
+    body.light .card {
+      background: var(--card);
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow: var(--shadow);
+    }
+    .card h4{margin:0 0 8px 0; font-weight:600; color:#cfd5df}
+    body.light .card h4 {
+      color: #444;
+    }
+    .kpi-val{font-size:1.8rem; font-weight:700; margin-bottom:6px;}
+    .kpi-sub{color:var(--muted); font-size:.88rem}
+
+    /* Sparkline SVG in KPI cards */
+    .sparkline {
+      width: 100%;
+      height: 30px;
+      margin-top: 6px;
+    }
+    .sparkline path {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: sparkline-draw 2s forwards ease-in-out;
+    }
+    @keyframes sparkline-draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .content{
+      padding:22px;
+      display:grid; gap:var(--grid-gap);
+      grid-template-columns: 1.2fr .8fr;
+      grid-auto-rows:minmax(160px, auto);
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    body.light .panel {
+      background: var(--panel);
+      border:1px solid rgba(0,0,0,.08);
+      box-shadow: var(--shadow);
+    }
+    .panel h3{margin:0 0 12px 0; font-size:1.05rem; color:#dee3ea}
+    body.light .panel h3 {
+      color: #333;
+    }
+    .muted{color:var(--muted); font-size:.9rem}
+
+    /* Donut chart */
+    .donut-wrap{
+      display:flex; align-items:center; gap:18px;
+    }
+    .donut{
+      --size:160px;
+      width:var(--size); height:var(--size); border-radius:50%;
+      background:
+        radial-gradient(closest-side, #0f1624 70%, transparent 71% 99%, #0f1624 0),
+        conic-gradient(var(--accent) var(--p), rgba(255,255,255,.08) 0);
+      position:relative;
+      box-shadow: inset 0 0 32px rgba(0,0,0,.6), 0 6px 20px rgba(216,27,96,.35);
+      transition: .6s cubic-bezier(.2,.7,.1,1);
+    }
+    body.light .donut {
+      background:
+        radial-gradient(closest-side, #f0f0f0 70%, transparent 71% 99%, #f0f0f0 0),
+        conic-gradient(var(--accent) var(--p), rgba(0,0,0,.05) 0);
+      box-shadow: inset 0 0 32px rgba(0,0,0,.1), 0 6px 20px rgba(216,27,96,.2);
+    }
+    .donut::after{
+      content: attr(data-label);
+      position:absolute; inset:0; display:grid; place-items:center;
+      color:#fff; font-weight:700; font-size:1.2rem;
+      text-shadow:0 2px 10px rgba(0,0,0,.4);
+    }
+    body.light .donut::after {
+      color: #222;
+      text-shadow:none;
+    }
+
+    /* Line chart (SVG) */
+    .line{
+      width:100%; height:220px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(216,27,96,.12), rgba(216,27,96,0) 60%);
+      border:1px solid rgba(255,255,255,.06); position:relative; overflow:hidden;
+    }
+    body.light .line {
+      background:linear-gradient(180deg, rgba(216,27,96,.08), rgba(216,27,96,0) 60%);
+      border:1px solid rgba(0,0,0,.1);
+    }
+    .line svg{ width:100%; height:100% }
+    .legend{display:flex; gap:14px; margin-top:10px; color:#cfd5df; font-size:.88rem}
+    body.light .legend {
+      color: #444;
+    }
+    .dot{width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px}
+    .dot.love{background:var(--accent)}
+    .dot.money{background:#5aa9e6}
+
+    /* Bars */
+    .bars{display:grid; gap:10px}
+    .bar{
+      background:#0f1a2a; border-radius:12px; overflow:hidden; position:relative; border:1px solid rgba(255,255,255,.06);
+    }
+    body.light .bar {
+      background: #f0f0f0;
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .bar .fill{
+      height:36px; width:0%;
+      display:flex; align-items:center; justify-content:flex-end; padding-right:10px;
+      color:#fff; font-weight:700; letter-spacing:.5px;
+      transition: width 1.2s ease-in-out;
+    }
+    body.light .bar .fill {
+      color: #222;
+    }
+    .bar .label{
+      position:absolute; inset:0; display:flex; align-items:center; padding-left:12px; color:#cfd5df; font-weight:600;
+    }
+    body.light .bar .label {
+      color: #666;
+    }
+
+    /* Table */
+    table{
+      width:100%; border-collapse:separate; border-spacing:0 10px; color:#e8ebf1;
+    }
+    body.light table {
+      color: #222;
+    }
+    th{ text-align:left; font-size:.85rem; color:#aab3c2; font-weight:600; padding:0 10px 6px }
+    body.light th {
+      color: #666;
+    }
+    td{
+      background:#111a2b; border:1px solid rgba(255,255,255,.06);
+      padding:12px 10px; border-left:none; border-right:none;
+    }
+    body.light td {
+      background: #fff;
+      border:1px solid rgba(0,0,0,.08);
+      color: #222;
+    }
+    tr{ border-radius:12px; overflow:hidden }
+    tr td:first-child{ border-radius:10px 0 0 10px; border-left:1px solid rgba(255,255,255,.06)}
+    tr td:last-child{ border-radius:0 10px 10px 0; border-right:1px solid rgba(255,255,255,.06)}
+
+    /* CTA */
+    .cta{
+      display:flex; align-items:center; justify-content:center; gap:14px; padding:18px;
+      background:linear-gradient(90deg, rgba(216,27,96,.15), rgba(255,179,0,.12));
+      border:1px dashed rgba(255,255,255,.18); border-radius:14px; color:#ffe9f1; font-weight:600;
+    }
+    body.light .cta {
+      color: #b01752;
+      background: linear-gradient(90deg, rgba(216,27,96,.08), rgba(255,179,0,.06));
+      border:1px dashed rgba(176,23,82,.3);
+    }
+    .cta button{
+      padding:12px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:700;
+      background:linear-gradient(180deg, var(--accent), #b01752);
+      color:#fff; box-shadow:0 10px 20px rgba(216,27,96,.35);
+      transition:.25s;
+    }
+    .cta button:hover{ transform: translateY(-1px); }
+
+    /* Footer */
+    footer{ color:#9ba7b8; padding:16px 22px; border-top:1px solid rgba(255,255,255,.06) }
+    body.light footer {
+      color: #666;
+      border-top:1px solid rgba(0,0,0,.1);
+    }
+    .disclaimer{ font-size:.85rem; color:#a7b0c0 }
+    body.light .disclaimer {
+      color: #888;
+    }
+
+    /* Responsive */
+    @media (max-width:1100px){
+      .kpis{ grid-template-columns: repeat(2, minmax(180px,1fr)); }
+      .content{ grid-template-columns:1fr; }
+      aside{ position:static; height:auto }
+      .layout{ grid-template-columns: 1fr; }
+    }
+
+    /* Progress bars for Metas en Pareja */
+    .progress-bar {
+      background: #222e44;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 24px;
+      margin-bottom: 12px;
+      position: relative;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    body.light .progress-bar {
+      background: #e0e0e0;
+      border: 1px solid rgba(0,0,0,.1);
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 12px 0 0 12px;
+      background: linear-gradient(90deg, var(--accent), #b01752);
+      width: 0;
+      color: #fff;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      transition: width 1.2s ease-in-out;
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+    body.light .progress-fill {
+      color: #fff;
+    }
+    .progress-label {
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    body.light .progress-label {
+      color: #444;
+    }
+
+    /* Music player */
+    #musicPlayer {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--panel);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+      transition: background 0.3s;
+    }
+    body.light #musicPlayer {
+      background: var(--panel);
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+    #musicPlayer svg {
+      fill: var(--accent);
+      width: 24px;
+      height: 24px;
+      user-select: none;
+    }
+
+    /* Botones personalizados unificados */
+    #themeToggle, #presentBtn, #surpriseBtn {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(0,0,0,.25);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    #themeToggle:hover, #presentBtn:hover, #surpriseBtn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+    }
+    #themeToggle:active, #presentBtn:active, #surpriseBtn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Carousel styles */
+    .carousel {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s;
+      width: 100%;
+    }
+    .carousel-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      display: none;
+      position: relative;
+      justify-content: center;
+      align-items: center;
+    }
+    .carousel-slide img {
+      width: 100%;
+      height: 300px;      /* Ajusta según quieras */
+      object-fit: contain;
+      border-radius: 12px;
+      display: block;
+    }
+    .carousel-slide.active {
+      display: block;
+    }
+    /* Carousel caption style */
+    .carousel-caption {
+      position:absolute;
+      bottom:12px;
+      left:0; right:0;
+      text-align:center;
+      font-size:1rem;
+      font-weight:600;
+      color:#fff;
+      text-shadow:0 2px 6px rgba(0,0,0,.6);
+      background:rgba(0,0,0,.25);
+      padding:6px 10px;
+      border-radius:6px;
+      margin:0 auto;
+      max-width:90%;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="brand-logo" onclick="alert('Todo mi capital emocional eres tú ❤️')"></div>
+        <h1>FinLove</h1>
+      </div>
+      <nav class="nav">
+        <a href="#dashboard" class="active">📊 Dashboard</a>
+        <a href="#graficas">📈 Gráficas</a>
+        <a href="#ranking">💼 Portafolio</a>
+        <a href="#mipareja">❤️ Mi inversión</a>
+        <a href="#contacto">✉️ Contacto</a>
+      </nav>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div class="top-title">Balance emocional — Septiembre</div>
+        <div class="top-actions">
+          <span class="muted">Rendimiento YTD</span>
+          <strong style="margin-left:8px; color:var(--ok)">+42.7%</strong>
+          <button id="themeToggle" aria-label="Toggle theme">Modo Claro</button>
+          <button id="presentBtn" style="margin-left:12px" aria-label="Modo presentación">Presentación</button>
+          <button id="surpriseBtn" style="margin-left:8px" aria-label="Sorpresa de corazones">Sorpresa ❤️</button>
+        </div>
+      </header>
+
+      <!-- KPIs -->
+      <section id="dashboard" class="kpis">
+        <div class="card reveal">
+          <h4>Retorno del Amor (ROI)</h4>
+          <div class="kpi-val">∞</div>
+          <div class="kpi-sub">Porque contigo el crecimiento no tiene techo.</div>
+          <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 20 L20 10 L40 15 L60 5 L80 10 L100 0"/></svg>
+        </div>
+        <div class="card reveal">
+          <h4>Felicidad Acumulada</h4>
+          <div class="kpi-val">100%</div>
+          <div class="kpi-sub">Diversificada en risas, abrazos y aventuras.</div>
+          <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 25 L20 20 L40 22 L60 18 L80 20 L100 15"/></svg>
+        </div>
+        <div class="card reveal">
+          <h4>Riesgo de Pérdida</h4>
+          <div class="kpi-val" style="color:var(--ok)">0.0%</div>
+          <div class="kpi-sub">Cobertura total: confianza y comunicación.</div>
+          <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 10 L20 8 L40 7 L60 6 L80 5 L100 4"/></svg>
+        </div>
+        <div class="card reveal">
+          <h4>Horizonte Temporal</h4>
+          <div class="kpi-val">Para siempre</div>
+          <div class="kpi-sub">Estrategia: buy &amp; hold de por vida ❤️</div>
+          <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true"><path d="M0 15 L20 15 L40 15 L60 15 L80 15 L100 15"/></svg>
+        </div>
+      </section>
+
+      <!-- Content grid -->
+      <section class="content" id="graficas">
+        <!-- Donut -->
+        <div class="panel glass">
+          <h3>Composición de Felicidad</h3>
+          <div class="donut-wrap">
+            <div class="donut" id="donut" style="--p: 60%;" data-label="Amor 60%"></div>
+            <div class="muted">
+              <div><strong>60%</strong> Amor</div>
+              <div><strong>20%</strong> Risas</div>
+              <div><strong>15%</strong> Aventuras</div>
+              <div><strong>5%</strong> Discusiones (que nos hacen crecer)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Line -->
+        <div class="panel glass">
+          <h3>Crecimiento del Amor a lo largo del tiempo</h3>
+          <div class="line" id="line">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+              <!-- grid -->
+              <g stroke="rgba(255,255,255,.08)" stroke-width="0.5">
+                <path d="M0 80 H100"/><path d="M0 60 H100"/><path d="M0 40 H100"/><path d="M0 20 H100"/>
+              </g>
+              <path id="lovePath" d="M0,85 C10,80 20,78 30,70 C40,62 50,58 60,50 C70,40 82,34 100,20" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            </svg>
+          </div>
+          <div class="legend">
+            <span><span class="dot love"></span> Amor acumulado</span>
+            <span><span class="dot money"></span> Dinero (comparativo)</span>
+          </div>
+        </div>
+
+        <!-- Bars -->
+        <div class="panel glass">
+          <h3>Comparativa de Inversiones</h3>
+          <div class="bars">
+            <div class="bar">
+              <div class="label">Amor (la tuya)</div>
+              <div class="fill" data-w="100" style="background:linear-gradient(90deg, var(--accent), #b01752);">100%</div>
+            </div>
+            <div class="bar">
+              <div class="label">Dinero</div>
+              <div class="fill" data-w="70" style="background:#5aa9e6;">70%</div>
+            </div>
+            <div class="bar">
+              <div class="label">Bienes materiales</div>
+              <div class="fill" data-w="42" style="background:#7a9e7e;">42%</div>
+            </div>
+            <div class="bar">
+              <div class="label">Tiempo libre</div>
+              <div class="fill" data-w="58" style="background:#ffd166; color:#111;">58%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table / Ranking -->
+        <div class="panel glass" id="ranking">
+          <h3>Ranking de Portafolio (retorno esperado)</h3>
+          <table>
+            <thead>
+              <tr><th>Activos</th><th>Horizonte</th><th>Volatilidad</th><th>Rendimiento</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>❤️ Amor (Tú)</td><td>∞</td><td>Baja</td><td style="color:var(--ok)">Infinito</td>
+              </tr>
+              <tr>
+                <td>💸 Dinero</td><td>Mediano</td><td>Media</td><td>Variable</td>
+              </tr>
+              <tr>
+                <td>✈️ Viajes</td><td>Largo</td><td>Media</td><td>Alto (emocional)</td>
+              </tr>
+              <tr>
+                <td>📚 Estudios</td><td>Largo</td><td>Baja</td><td>Alto</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CTA romántica -->
+        <div class="panel glass" id="mipareja">
+          <h3>Mi Inversión Estrella</h3>
+          <div class="cta">
+            <span>Después de analizar todas las opciones del mercado…</span>
+            <button onclick="document.getElementById('loveNote').showModal()">Invertir en nosotros</button>
+            <button onclick="alert('PDF descargado 💌')" style="padding:12px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:700; background: linear-gradient(180deg, #6a1b4d, #9c2f68); color:#fff; box-shadow:0 10px 20px rgba(216,27,96,.35);">Descargar PDF</button>
+          </div>
+          <p class="muted" style="margin-top:10px">Disclaimer: Ninguna inversión es 100% segura… excepto la de mi corazón contigo. 💞</p>
+        </div>
+
+        <!-- Metas en Pareja -->
+        <div class="panel glass" id="metas-pareja">
+          <h3>Metas en Pareja</h3>
+          <div>
+            <div class="progress-label">✈️ Viajes</div>
+            <div class="progress-bar" aria-label="Progreso de Viajes">
+              <div class="progress-fill" style="width: 75%;">75%</div>
+            </div>
+            <div class="progress-label">🏠 Casa</div>
+            <div class="progress-bar" aria-label="Progreso de Casa">
+              <div class="progress-fill" style="width: 40%;">40%</div>
+            </div>
+            <div class="progress-label">🎉 Experiencias</div>
+            <div class="progress-bar" aria-label="Progreso de Experiencias">
+              <div class="progress-fill" style="width: 55%;">55%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área animada (Amor como montaña) -->
+        <div class="panel reveal glass">
+          <h3>Amor en tendencia (área)</h3>
+          <div class="area">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="gradLove" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(216,27,96,.6)"/>
+                  <stop offset="100%" stop-color="rgba(216,27,96,0)"/>
+                </linearGradient>
+              </defs>
+              <path id="areaPath" d="M0,90 L0,90 L10,88 L20,80 L30,76 L40,70 L50,62 L60,54 L70,46 L80,34 L90,26 L100,18 L100,100 L0,100 Z"
+                    fill="url(#gradLove)" stroke="var(--accent)" stroke-width="1.2" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            </svg>
+          </div>
+          <div class="muted">Cada paso juntos suma a la montaña de momentos que estamos construyendo.</div>
+        </div>
+
+        <!-- Anillos de emociones -->
+        <div class="panel reveal glass">
+          <h3>Composición de emociones</h3>
+          <div class="rings">
+            <div class="ring" style="--c:var(--accent); --p:70%;" data-label="Amor 70%"></div>
+            <div class="ring" style="--c:#5aa9e6; --p:20%;" data-label="Risas 20%"></div>
+            <div class="ring" style="--c:#ffd166; --p:8%;" data-label="Aventuras 8%"></div>
+            <div class="ring" style="--c:#7a9e7e; --p:2%;" data-label="Disc. 2%"></div>
+          </div>
+        </div>
+
+        <!-- Contador de días juntos -->
+        <div class="panel reveal glass" id="contadorPanel">
+          <h3>Días a tu lado</h3>
+          <p class="muted">Desde <strong id="startDateLabel">2024-02-14</strong></p>
+          <div class="card" style="display:inline-block; padding:14px 18px; border-radius:12px; margin-top:6px;">
+            <span style="font-size:2rem; font-weight:700" id="daysCounter">0</span>
+            <span style="margin-left:8px">días y contando…</span>
+          </div>
+          <!-- Carousel de fotos -->
+          <div class="carousel" id="loveCarousel" style="margin-top:18px; position:relative; max-width:400px">
+            <div class="carousel-track">
+              <div class="carousel-slide active">
+                <img src="IMG/243baaa7-1acd-46c3-ae75-95a2844518eb.JPG" alt="Foto 1">
+                <div class="carousel-caption">La</div>
+              </div>
+              <div class="carousel-slide">
+                <img src="IMG/906a1bec-a80a-40cb-b85d-37acb46ca5d4.JPG" alt="Foto 2">
+                <div class="carousel-caption">mejor</div>
+              </div>
+              <div class="carousel-slide">
+                <img src="IMG/d9d25efa-fa48-4316-84a0-a57abec016e0.JPG" alt="Foto 3">
+                <div class="carousel-caption">inversion</div>
+              </div>
+              <div class="carousel-slide">
+                <img src="IMG/IMG_0148.JPG" alt="Foto 3">
+                <div class="carousel-caption">siempre fuiste</div>
+              </div>
+              <div class="carousel-slide">
+                <img src="IMG/IMG_0215.jpg" alt="Foto 3">
+                <div class="carousel-caption">TU</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LoveCoin -->
+        <div class="panel reveal glass" id="coinPanel">
+          <h3>AmorCoin — edición conmemorativa</h3>
+          <div id="coinCard">
+            <canvas id="coinCanvas" width="520" height="520"></canvas>
+            <div>
+              <p class="muted">Un recuerdo para atesorar: nuestra moneda de amor con tu inicial en dorado.</p>
+              <button id="downloadCoin" class="cta-btn" style="padding:12px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:700; background:linear-gradient(180deg, var(--accent-2), #e09e00); color:#111; box-shadow:0 10px 20px rgba(255,179,0,.35);">Descargar AmorCoin</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div class="disclaimer">© 2025 FinLove — “Buy &amp; Hold” de nuestra historia. Hecho con ❤️ para ti.</div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Love Note Dialog -->
+  <dialog id="loveNote" style="border:none; border-radius:16px; background:#101723; color:#fff; padding:24px; width:min(520px, 92%); box-shadow:0 18px 50px rgba(0,0,0,.6)">
+    <h2 style="margin:0 0 6px 0">Mi nota de inversión</h2>
+    <p style="margin:0 0 14px 0; color:#cfd5df">Tú eres mi activo de mayor valor, mi seguridad, mi presente y mi futuro. Prometo diversificar en besos, reinvertir en abrazos y nunca vender en pánico. 💗</p>
+    <div style="display:flex; gap:10px; justify-content:flex-end">
+      <button onclick="document.getElementById('loveNote').close()" style="padding:10px 14px; border:none; border-radius:10px; background:#233046; color:#dfe6ef; cursor:pointer">Cerrar</button>
+      <button onclick="this.textContent='Confirmado ✅'; this.style.background='linear-gradient(180deg,#2ecc71,#1eac5b)';" style="padding:10px 14px; border:none; border-radius:10px; background:linear-gradient(180deg, var(--accent), #b01752); color:#fff; cursor:pointer; box-shadow:0 10px 20px rgba(216,27,96,.35)">Confirmar inversión</button>
+    </div>
+  </dialog>
+
+  <!-- Music player -->
+  <div id="musicPlayer" role="button" aria-label="Reproducir música romántica" tabindex="0" title="Reproducir/Pausar música">
+    <svg id="musicIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+  </div>
+  <audio id="romanticAudio" loop preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/23/audio_7f5a8e3d94.mp3?filename=romantic-piano-ambient-11057.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio HTML5.
+  </audio>
+
+  <script>
+    // ===== Scroll Reveal =====
+    const revealEls = document.querySelectorAll('.panel, .card, .reveal');
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('is-visible'); }
+      });
+    },{threshold:.2});
+    revealEls.forEach(el=>{ el.classList.add('reveal'); io.observe(el); });
+
+    // ===== Area chart animation =====
+    const area = document.getElementById('areaPath');
+    if(area){
+      requestAnimationFrame(()=>{ area.style.transition='stroke-dashoffset 1800ms ease-in-out'; area.style.strokeDashoffset='0'; });
+    }
+
+    // ===== KPI Double-click Tooltip =====
+    document.querySelectorAll('.kpis .card').forEach(card=>{
+      const tip = document.createElement('div');
+      tip.className = 'kpi-tooltip';
+      tip.textContent = 'Eres mi ROI infinito 💘';
+      card.appendChild(tip);
+      card.addEventListener('dblclick', ()=>{
+        card.classList.add('show-tip');
+        setTimeout(()=> card.classList.remove('show-tip'), 1600);
+      });
+    });
+
+    // ===== Heart Rain Surprise =====
+    function heartRain() {
+      const emojis = ['❤️','💖','💘','💕','💗'];
+      for(let i=0;i<36;i++){
+        const h = document.createElement('div');
+        h.className = 'heart-drop';
+        h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        h.style.left = Math.random()*100 + 'vw';
+        h.style.setProperty('--dx', (Math.random()*60 - 30) + 'px');
+        h.style.animationDuration = (2.4 + Math.random()*1.2)+'s';
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(), 3600);
+      }
+    }
+    document.getElementById('surpriseBtn')?.addEventListener('click', heartRain);
+
+    // ===== Presentation Mode =====
+    function togglePresent(on=true){
+      const ov = document.getElementById('presentOverlay');
+      if(!ov) return;
+      if(on){
+        ov.classList.add('active');
+        try { document.documentElement.requestFullscreen(); } catch(e){}
+      } else {
+        ov.classList.remove('active');
+        if(document.fullscreenElement){ document.exitFullscreen(); }
+        if(slideTimer){ clearInterval(slideTimer); }
+      }
+    }
+    document.getElementById('presentOverlay')?.addEventListener('click', (e)=>{
+      if(e.target.id==='presentOverlay') togglePresent(false);
+    });
+
+    // ===== Automatic Presentation Slideshow =====
+    let slideIndex = 0;
+    let slideTimer;
+    function startSlideshow(){
+      const slides = document.querySelectorAll('#presentOverlay .slide');
+      slides.forEach(s => s.classList.remove('visible'));
+      slideIndex = 0;
+      if(slides.length){
+        slides[0].classList.add('visible');
+      }
+      slideTimer = setInterval(()=>{
+        slideIndex++;
+        if(slideIndex < slides.length){
+          slides[slideIndex].classList.add('visible');
+        } else {
+          clearInterval(slideTimer);
+          // trigger heart rain at end
+          heartRain();
+          // close after a few seconds
+          setTimeout(()=> togglePresent(false), 6000);
+        }
+      }, 5000); // every 5 seconds
+    }
+
+    const presentBtn = document.getElementById('presentBtn');
+    presentBtn?.addEventListener('click', ()=>{
+      togglePresent(true);
+      startSlideshow();
+    });
+
+    // ===== Days Counter =====
+    (function(){
+      const start = new Date('2025-09-08T00:00:00'); // <-- cámbialo a su fecha especial
+      const label = document.getElementById('startDateLabel');
+      const out = document.getElementById('daysCounter');
+      if(label) label.textContent = start.toISOString().slice(0,10);
+      function updateDays(){
+        const now = new Date();
+        const diff = Math.floor((now - start)/(1000*60*60*24));
+        if(out) out.textContent = diff.toLocaleString();
+      }
+      updateDays();
+      setInterval(updateDays, 60*60*1000);
+    })();
+
+    // ===== LoveCoin Canvas =====
+    (function(){
+      const c = document.getElementById('coinCanvas');
+      if(!c) return;
+      const ctx = c.getContext('2d');
+      const W = c.width, H = c.height;
+      // Background gradient
+      const g = ctx.createRadialGradient(W*0.5, H*0.4, 40, W*0.5, H*0.5, W*0.48);
+      g.addColorStop(0, '#ffde89');
+      g.addColorStop(1, '#b57f00');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(W/2, H/2, W*0.44, 0, Math.PI*2); ctx.fill();
+      // Rim
+      ctx.lineWidth = 18; ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.beginPath(); ctx.arc(W/2, H/2, W*0.44-9, 0, Math.PI*2); ctx.stroke();
+
+      // Inscriptions
+      ctx.fillStyle = '#3b2b00'; ctx.font = '700 28px Montserrat';
+      ctx.textAlign = 'center';
+      ctx.fillText('AMOR • FINLOVE •', W/2, H*0.20);
+
+      // Center heart
+      ctx.font = '900 160px Montserrat'; ctx.fillStyle = '#d81b60';
+      ctx.fillText('❤', W/2, H*0.60);
+
+      // Initial (customizable)
+      ctx.fillStyle = '#3b2b00'; ctx.font = '800 56px Montserrat';
+      ctx.fillText('S & S', W/2, H*0.90);
+
+      // Download
+      const dl = document.getElementById('downloadCoin');
+      dl?.addEventListener('click', ()=>{
+        const link = document.createElement('a');
+        link.download = 'AmorCoin.png';
+        link.href = c.toDataURL('image/png');
+        link.click();
+      });
+    })();
+    // Animación de la línea (stroke reveal)
+    const path = document.getElementById('lovePath');
+    if(path){
+      requestAnimationFrame(()=>{ path.style.transition='stroke-dashoffset 1800ms ease-in-out'; path.style.strokeDashoffset='0'; });
+    }
+    // Animación de barras al cargar
+    const fills = document.querySelectorAll('.fill');
+    fills.forEach(el=>{
+      const w = el.getAttribute('data-w');
+      setTimeout(()=> el.style.width = w + '%', 150);
+    });
+    // Donut dinámico
+    const donut = document.getElementById('donut');
+    if(donut){
+      let p = 0;
+      const target = 60; // %
+      const int = setInterval(()=>{
+        p += 2;
+        donut.style.setProperty('--p', p + '%');
+        donut.setAttribute('data-label', 'Amor ' + p + '%');
+        if(p >= target) clearInterval(int);
+      }, 30);
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    function updateToggleText() {
+      if(body.classList.contains('light')){
+        themeToggle.textContent = 'Modo Oscuro';
+      } else {
+        themeToggle.textContent = 'Modo Claro';
+      }
+    }
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('light');
+      updateToggleText();
+    });
+    updateToggleText();
+
+    // Music player toggle
+    const musicPlayer = document.getElementById('musicPlayer');
+    const audio = document.getElementById('romanticAudio');
+    const musicIcon = document.getElementById('musicIcon');
+    let isPlaying = false;
+
+    function updateIcon() {
+      if(isPlaying){
+        musicIcon.innerHTML = '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';
+      } else {
+        musicIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+      }
+    }
+
+    musicPlayer.addEventListener('click', () => {
+      if(isPlaying){
+        audio.pause();
+      } else {
+        audio.play();
+      }
+    });
+    audio.addEventListener('play', () => {
+      isPlaying = true;
+      updateIcon();
+    });
+    audio.addEventListener('pause', () => {
+      isPlaying = false;
+      updateIcon();
+    });
+    // Accessibility: allow keyboard toggle
+    musicPlayer.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        musicPlayer.click();
+      }
+    });
+
+    updateIcon();
+
+    // ===== Carousel Logic =====
+    (function() {
+      const carousel = document.querySelector('#loveCarousel');
+      if (!carousel) return;
+      const slides = carousel.querySelectorAll('.carousel-slide');
+      let currentIndex = 0;
+      function showSlide(idx) {
+        slides.forEach((slide, i) => {
+          if (i === idx) {
+            slide.classList.add('active');
+          } else {
+            slide.classList.remove('active');
+          }
+        });
+      }
+      showSlide(currentIndex);
+      setInterval(() => {
+        slides[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add('active');
+      }, 3000);
+    })();
+
+  </script>
+</body>
+</html>
+</script>
+
+  <div id="presentOverlay">
+    <button class="close" onclick="togglePresent(false)">Salir</button>
+    <div class="stage">
+      <div class="panel glass slide">
+        <h3 style="margin-top:0">Nuestra Historia 💞</h3>
+        <p class="muted">Todo comenzó con una chispa, y hoy somos el mejor proyecto que pude imaginar. Invertí mi tiempo, mi confianza y mi corazón… y cada día recibo más amor a cambio.</p>
+      </div>
+      <div class="panel glass slide">
+        <h3>Lo que hemos ganado juntos 🌹</h3>
+        <ul>
+          <li>Confianza que no tiene precio</li>
+          <li>Risas que valen más que el oro</li>
+          <li>Momentos únicos que se convierten en recuerdos eternos</li>
+        </ul>
+      </div>
+      <div class="panel glass slide">
+        <h3>Mi Conclusión ❤️</h3>
+        <p>Después de analizar todas las inversiones posibles… descubrí que la mejor de todas eres tú. No hay riesgo, solo amor. Y mi estrategia es clara: <strong>Buy &amp; Hold contigo para toda la vida</strong>.</p>
+      </div>
+    </div>
+  </div>
